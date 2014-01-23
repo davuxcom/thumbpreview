@@ -50,13 +50,13 @@
             // 
             this.mnuAlwaysOnTop.Checked = true;
             this.mnuAlwaysOnTop.Index = 0;
-            this.mnuAlwaysOnTop.Text = "&Always On Top";
+            this.mnuAlwaysOnTop.Text = "&Always on top";
             this.mnuAlwaysOnTop.Click += new System.EventHandler(this.mnuAlwaysOnTop_Click);
             // 
             // mnuHidewhenTargetHasFocus
-            // 
+            //  
             this.mnuHidewhenTargetHasFocus.Index = 1;
-            this.mnuHidewhenTargetHasFocus.Text = "&Hide When Target Has Focus";
+            this.mnuHidewhenTargetHasFocus.Text = "&Hide when real window has focus";
             this.mnuHidewhenTargetHasFocus.Click += new System.EventHandler(this.mnuHidewhenTargetHasFocus_Click);
             // 
             // menuItem1
@@ -83,13 +83,11 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(125, 125);
             this.Name = "PreviewWindow";
-            this.ShowInTaskbar = false;
             this.TopMost = true;
-            this.Load += new System.EventHandler(this.PreviewWindow_Load);
-            this.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.PreviewWindow_MouseWheel);
-            this.MouseClick += new System.Windows.Forms.MouseEventHandler(this.PreviewWindow_MouseClick);
             this.DoubleClick += new System.EventHandler(this.PreviewWindow_DoubleClick);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.PreviewWindow_KeyUp);
+            this.MouseClick += new System.Windows.Forms.MouseEventHandler(this.PreviewWindow_MouseClick);
+            this.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.PreviewWindow_MouseWheel);
             this.ResumeLayout(false);
 
         }

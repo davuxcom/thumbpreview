@@ -147,7 +147,7 @@ namespace ThumbPreview
             _ThumbnailHandle = DwmRegisterThumbnail(form.Handle, PreviewHandle);
 
             _Properties = new DWM_THUMBNAIL_PROPERTIES();
-
+             
             _Properties.dwFlags =
                     DWM_THUMBNAIL_PROPERTIES.DWM_TNP_VISIBLE +
                     DWM_THUMBNAIL_PROPERTIES.DWM_TNP_OPACITY +
@@ -204,7 +204,7 @@ namespace ThumbPreview
             {
                 DwmQueryThumbnailSourceSize(_ThumbnailHandle, out sz);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 _form.Close();
                 return;
@@ -229,11 +229,10 @@ namespace ThumbPreview
                 try
                 {
                     DwmUpdateThumbnailProperties(_ThumbnailHandle, _Properties);
-
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    return;
+                    return; // Can't do anything about it.
                 }
 
                 if (_form.ClientSize.Width == _oldSize.Width)
@@ -258,10 +257,7 @@ namespace ThumbPreview
                     {
                         DwmUnregisterThumbnail(_ThumbnailHandle);
                     }
-                    catch (Exception ex)
-                    {
-                        // FIXME: handle this
-                    }
+                    catch (Exception) { } // shutting down
                 _ThumbnailHandle = IntPtr.Zero;
             }
         }

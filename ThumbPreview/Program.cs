@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Diagnostics;
 using System.Drawing;
 using System.Text;
-
+ 
 namespace ThumbPreview
 {
     static class Program
@@ -14,7 +14,6 @@ namespace ThumbPreview
         static KeyboardHook hook;
         static NotifyIcon nicon;
         static ContextMenu mnu;
-
         static MenuItem _sep;
 
         static LinkedList<PreviewWindow> windows = new LinkedList<PreviewWindow>();
@@ -24,7 +23,6 @@ namespace ThumbPreview
 
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
         static extern int GetWindowTextLength(IntPtr hWnd);
-        
 
         [DllImport("user32.dll")]
         static extern IntPtr GetForegroundWindow();
@@ -39,12 +37,8 @@ namespace ThumbPreview
         [DllImport("user32.dll")]
         static extern IntPtr WindowFromPoint(Point Point);
 
-
         public static string GetText(IntPtr hWnd)
         {
-            //return "TEST";
-
-            //.MenuItem.int length = GetWindowTextLength(hWnd);
             StringBuilder sb = new StringBuilder(255);
             GetWindowText(hWnd,  sb, sb.Capacity);
             return sb.ToString();
@@ -55,25 +49,21 @@ namespace ThumbPreview
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-
-            //  DavuxLib.Registration.CanExecuteEx("ThumbPreview", "", true);
-
             try
             {
                 if (!DWM.DwmIsCompositionEnabled())
                 {
-                    DialogResult ret = MessageBox.Show("Desktop Window Composition (Aero) is not enabled.  Would you like to enable it?", "DWM is not enabled", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-
+                    DialogResult ret = MessageBox.Show("DWM is not enabled. Would you like to enable it?", 
+                        "DWM is not enabled", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                     if (ret == DialogResult.Yes)
                     {
                         DWM.DwmEnableComposition(true);
-
                         if (!DWM.DwmIsCompositionEnabled())
                         {
-                            MessageBox.Show("The DWM could not be enabled.  This must be corrected before running this application.", "Problem enabling DWM", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show("DWM could not be enabled. This must be corrected before running this application.", 
+                                "Problem changing system setting.", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             Application.Exit();
                         }
-
                     }
                     else
                     {
@@ -92,19 +82,18 @@ namespace ThumbPreview
                 hook = new KeyboardHook();
                 hook.KeyPressed += new EventHandler<KeyPressedEventArgs>(hook_KeyPressed);
                 hook.RegisterHotKey(KBModifierKeys.Control | KBModifierKeys.Shift, Keys.Z);
+                // No longer allowed as of Windows 8
                 //hook.RegisterHotKey(KBModifierKeys.Win | KBModifierKeys.Shift, Keys.Z);
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Could not register keyboard shortcut (Win+Z).", "There was a problem creating a keyboard shortcut", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Could not register keyboard shortcut (Ctrl+Shift+Z):\n\n" + ex.Message, "There was a problem creating a keyboard shortcut", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Application.Exit();
             }
 
-
-
             mnu = new ContextMenu();
 
-             _sep = new MenuItem("-");
+            _sep = new MenuItem("-");
             _sep.Visible = false;
             mnu.MenuItems.Add(_sep);
             mnu.MenuItems.Add("&About", new EventHandler(mnuAbout_Click));
@@ -114,7 +103,7 @@ namespace ThumbPreview
             nicon = new NotifyIcon();
             nicon.Visible = true;
             nicon.Icon = new System.Drawing.Icon(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("ThumbPreview.Resources.AppIcon.ico"));
-            nicon.Text = "Movable Thumbnail Preview";
+            nicon.Text = "ThumbPreview";
             nicon.ContextMenu = mnu;
             nicon.Click += new EventHandler(nicon_Click);
 
@@ -123,13 +112,13 @@ namespace ThumbPreview
 
         static void mnuExit_Click(object sender, EventArgs e)
         {
-            nicon.Dispose();
+            nicon.Dispose(); // Cleanup the Notification Area before quitting.
             Application.Exit();
         }
 
         static void mnuAbout_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Movable Preview - By David Amenta - DaveAmenta@gmail.com - www.DaveAmenta.com","About Movable Preview",MessageBoxButtons.OK,MessageBoxIcon.Information);
+            MessageBox.Show("ThumbPreview - By Dave Amenta\n\nPress Ctrl+Shift+Z to get started.","About ThumbPreview",MessageBoxButtons.OK,MessageBoxIcon.Information);
         }
 
         static void nicon_Click(object sender, EventArgs e)
@@ -140,9 +129,9 @@ namespace ThumbPreview
                 {
                     if (win.Visible)
                     {
+                        // FIXME: There's got to be a better pattern than this, surely!
                         Debug.WriteLine("Showing (loop): " + win.Handle.ToString());
                         BringWindowToTop(win.Handle);
-
                         if (!win.TopMost)
                         {
                             win.TopMost = true;
@@ -154,10 +143,8 @@ namespace ThumbPreview
             }
         }
 
-
         static void hook_KeyPressed(object sender, KeyPressedEventArgs e)
         {
-            
             IntPtr pWin = IntPtr.Zero;
             /*
             if (e.Key == Keys.Z && e.Modifier == (KBModifierKeys.Win | KBModifierKeys.Shift))
@@ -202,17 +189,13 @@ namespace ThumbPreview
 
 
             PreviewWindow win = new PreviewWindow(pWin);
-
             win.Disposed += new EventHandler(win_Disposed);
 
             MenuItem mi = new MenuItem();
-
             mi.Tag = win;
             mi.Text = "Window: " + title;
             mi.Click += new EventHandler(mi_Click);
-
             mnu.MenuItems.Add(0, mi);
-
 
             windows.AddLast(win);
             Debug.WriteLine("Adding Window... ");
@@ -222,23 +205,17 @@ namespace ThumbPreview
         static void mi_Click(object sender, EventArgs e)
         {
             MenuItem item = (MenuItem)sender;
-
             if (item != null)
             {
                 PreviewWindow win = (PreviewWindow)item.Tag;
-
                 if (win != null)
                 {
                     win.KIllTimer();
                     Debug.WriteLine("Showing (click): " + win.Handle.ToString());
                     BringWindowToTop(win.Handle);
-                    
                 }
             }
-
         }
-
-
 
         static void win_Disposed(object sender, EventArgs e)
         {
@@ -258,7 +235,6 @@ namespace ThumbPreview
             {
                 _sep.Visible = false;
             }
-
 
             Debug.WriteLine("Removing Window...");
         }

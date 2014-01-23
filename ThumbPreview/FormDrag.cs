@@ -7,7 +7,7 @@ using System.Windows.Forms;
 namespace ThumbPreview
 {
     class FormDrag
-    {
+    { 
         Form _form;
         bool isDragging = false;
         int oldX, oldY = 0;
